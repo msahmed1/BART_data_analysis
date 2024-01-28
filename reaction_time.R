@@ -62,71 +62,66 @@ median_time_data <- aggregate(reaction_time ~ player_id + study_cond + robot_res
 # Rename the aggregated column reaction_time to "median_reaction_time"
 names(median_time_data)[4] <- "median_reaction_time"
 
-
-
 # Create a table where robot_response = 1 i.e. exclude all robot_response = 0
 reaction_time_for_inflate_request <- subset(median_time_data, robot_response == 1)
 
-# For Inflate Request - Study Condition 0
-inflate_cond_0 <- subset(reaction_time_for_inflate_request, study_cond == 0)
-mean_inflate_0 <- mean(inflate_cond_0$median_reaction_time)
-sd_inflate_0 <- sd(inflate_cond_0$median_reaction_time)
-inflate_cond_0_filtered <- subset(inflate_cond_0, median_reaction_time >= (mean_inflate_0 - 2 * sd_inflate_0) & median_reaction_time <= (mean_inflate_0 + 2 * sd_inflate_0))
+# For Inflate Request - Non-customise study condition
+rt_non_cust_inflate_requested <- subset(reaction_time_for_inflate_request, study_cond == 0)
+mean_inflate_0 <- mean(rt_non_cust_inflate_requested$median_reaction_time)
+sd_inflate_0 <- sd(rt_non_cust_inflate_requested$median_reaction_time)
+rt_non_cust_inflate_requested_filtered <- subset(rt_non_cust_inflate_requested, median_reaction_time >= (mean_inflate_0 - 2 * sd_inflate_0) & median_reaction_time <= (mean_inflate_0 + 2 * sd_inflate_0))
 
-# For inflate Request - Study Condition 1
-inflate_cond_1 <- subset(reaction_time_for_inflate_request, study_cond == 1)
-mean_inflate_1 <- mean(inflate_cond_1$median_reaction_time)
-sd_inflate_1 <- sd(inflate_cond_1$median_reaction_time)
-inflate_cond_1_filtered <- subset(inflate_cond_1, median_reaction_time >= (mean_inflate_1 - 2 * sd_inflate_1) & median_reaction_time <= (mean_inflate_1 + 2 * sd_inflate_1))
+# For inflate Request - Customise study condition
+rt_cust_inflate_requested <- subset(reaction_time_for_inflate_request, study_cond == 1)
+mean_inflate_1 <- mean(rt_cust_inflate_requested$median_reaction_time)
+sd_inflate_1 <- sd(rt_cust_inflate_requested$median_reaction_time)
+rt_cust_inflate_requested_filtered <- subset(rt_cust_inflate_requested, median_reaction_time >= (mean_inflate_1 - 2 * sd_inflate_1) & median_reaction_time <= (mean_inflate_1 + 2 * sd_inflate_1))
 
 # Create a table where robot_response = 0 i.e. exclude all robot_response = 1
 reaction_time_for_collect_request <- subset(median_time_data, robot_response == 0)
 
-# For Collect Request - Study Condition 0
-collect_cond_0 <- subset(reaction_time_for_collect_request, study_cond == 0)
-mean_collect_0 <- mean(collect_cond_0$median_reaction_time)
-sd_collect_0 <- sd(collect_cond_0$median_reaction_time)
-collect_cond_0_filtered <- subset(collect_cond_0, median_reaction_time >= (mean_collect_0 - 2 * sd_collect_0) & median_reaction_time <= (mean_collect_0 + 2 * sd_collect_0))
+# For Collect Request - Non-customise study condition
+rt_non_cust_collect_requested <- subset(reaction_time_for_collect_request, study_cond == 0)
+mean_collect_0 <- mean(rt_non_cust_collect_requested$median_reaction_time)
+sd_collect_0 <- sd(rt_non_cust_collect_requested$median_reaction_time)
+rt_non_cust_collect_requested_filtered <- subset(rt_non_cust_collect_requested, median_reaction_time >= (mean_collect_0 - 2 * sd_collect_0) & median_reaction_time <= (mean_collect_0 + 2 * sd_collect_0))
 
-# For Collect Request - Study Condition 1
-collect_cond_1 <- subset(reaction_time_for_collect_request, study_cond == 1)
-mean_collect_1 <- mean(collect_cond_1$median_reaction_time)
-sd_collect_1 <- sd(collect_cond_1$median_reaction_time)
-collect_cond_1_filtered <- subset(collect_cond_1, median_reaction_time >= (mean_collect_1 - 2 * sd_collect_1) & median_reaction_time <= (mean_collect_1 + 2 * sd_collect_1))
-
-
+# For Collect Request - Customise study condition
+rt_cust_collect_requested <- subset(reaction_time_for_collect_request, study_cond == 1)
+mean_collect_1 <- mean(rt_cust_collect_requested$median_reaction_time)
+sd_collect_1 <- sd(rt_cust_collect_requested$median_reaction_time)
+rt_cust_collect_requested_filtered <- subset(rt_cust_collect_requested, median_reaction_time >= (mean_collect_1 - 2 * sd_collect_1) & median_reaction_time <= (mean_collect_1 + 2 * sd_collect_1))
 
 # Find excluded participants for each study conditions
-excluded_inflate_cond_1 <- setdiff(inflate_cond_1$player_id, inflate_cond_1_filtered$player_id)
-excluded_collect_cond_1 <- setdiff(collect_cond_1$player_id, collect_cond_1_filtered$player_id)
+excluded_rt_cust_inflate_requested <- setdiff(rt_cust_inflate_requested$player_id, rt_cust_inflate_requested_filtered$player_id)
+excluded_rt_cust_collect_requested <- setdiff(rt_cust_collect_requested$player_id, rt_cust_collect_requested_filtered$player_id)
 
-excluded_inflate_cond_0 <- setdiff(inflate_cond_0$player_id, inflate_cond_0_filtered$player_id)
-excluded_collect_cond_0 <- setdiff(collect_cond_0$player_id, collect_cond_0_filtered$player_id)
+excluded_rt_non_cust_inflate_requested <- setdiff(rt_non_cust_inflate_requested$player_id, rt_non_cust_inflate_requested_filtered$player_id)
+excluded_rt_non_cust_collect_requested <- setdiff(rt_non_cust_collect_requested$player_id, rt_non_cust_collect_requested_filtered$player_id)
 
 # Combine excluded participant lists for each set of conditions
-all_excluded_cond_1 <- unique(c(excluded_inflate_cond_1, excluded_collect_cond_1))
-all_excluded_cond_0 <- unique(c(excluded_inflate_cond_0, excluded_collect_cond_0))
+all_excluded_ppt_cust_cond <- unique(c(excluded_rt_cust_inflate_requested, excluded_rt_cust_collect_requested))
+all_excluded_ppt_non_cust_cond <- unique(c(excluded_rt_non_cust_inflate_requested, excluded_rt_non_cust_collect_requested))
 
 # Exclude these participants from respective datasets
-inflate_cond_1_filtered <- inflate_cond_1_filtered[!inflate_cond_1_filtered$player_id %in% all_excluded_cond_1, ]
-collect_cond_1_filtered <- collect_cond_1_filtered[!collect_cond_1_filtered$player_id %in% all_excluded_cond_1, ]
+rt_cust_inflate_requested_filtered <- rt_cust_inflate_requested_filtered[!rt_cust_inflate_requested_filtered$player_id %in% all_excluded_ppt_cust_cond, ]
+rt_cust_collect_requested_filtered <- rt_cust_collect_requested_filtered[!rt_cust_collect_requested_filtered$player_id %in% all_excluded_ppt_cust_cond, ]
 
-inflate_cond_0_filtered <- inflate_cond_0_filtered[!inflate_cond_0_filtered$player_id %in% all_excluded_cond_0, ]
-collect_cond_0_filtered <- collect_cond_0_filtered[!collect_cond_0_filtered$player_id %in% all_excluded_cond_0, ]
-
+rt_non_cust_inflate_requested_filtered <- rt_non_cust_inflate_requested_filtered[!rt_non_cust_inflate_requested_filtered$player_id %in% all_excluded_ppt_non_cust_cond, ]
+rt_non_cust_collect_requested_filtered <- rt_non_cust_collect_requested_filtered[!rt_non_cust_collect_requested_filtered$player_id %in% all_excluded_ppt_non_cust_cond, ]
 
 # Test for Normality and Homogeneity
 perform_shapiro_test(
-  inflate_cond_0_filtered$median_reaction_time,
+  rt_non_cust_inflate_requested_filtered$median_reaction_time,
   "Shapiro-Wilk for Inflate Request, Study Condition 0"
 )
 
 perform_shapiro_test(
-  inflate_cond_1_filtered$median_reaction_time,
+  rt_cust_inflate_requested_filtered$median_reaction_time,
   "Shapiro-Wilk for Inflate Request, Study Condition 1"
 )
 
-inflate_request_combined <- rbind(inflate_cond_0_filtered, inflate_cond_1_filtered)
+inflate_request_combined <- rbind(rt_non_cust_inflate_requested_filtered, rt_cust_inflate_requested_filtered)
 
 inflate_request_combined$study_cond <- as.factor(inflate_request_combined$study_cond)
 
@@ -137,18 +132,18 @@ perform_levene_test(
 )
 
 perform_shapiro_test(
-  collect_cond_1_filtered$median_reaction_time,
+  rt_cust_collect_requested_filtered$median_reaction_time,
   "Shapiro-Wilk for Collect Request, Study Condition 1"
 )
 
 perform_shapiro_test(
-  collect_cond_0_filtered$median_reaction_time,
+  rt_non_cust_collect_requested_filtered$median_reaction_time,
   "Shapiro-Wilk for Collect Request, Study Condition 0"
 )
 
-qqPlot(collect_cond_1_filtered$median_reaction_time)
+qqPlot(rt_cust_collect_requested_filtered$median_reaction_time)
 
-collect_request_combined <- rbind(collect_cond_0_filtered, collect_cond_1_filtered)
+collect_request_combined <- rbind(rt_non_cust_collect_requested_filtered, rt_cust_collect_requested_filtered)
 
 collect_request_combined$study_cond <- as.factor(collect_request_combined$study_cond)
 
@@ -162,11 +157,6 @@ combined_filtered_reaction_time_data <- rbind(inflate_request_combined, collect_
 
 combined_filtered_reaction_time_data$robot_response <- as.factor(combined_filtered_reaction_time_data$robot_response)
 
-
-
-
-
-
 # Reshape data into wide format
 wide_data <- pivot_wider(
   data = combined_filtered_reaction_time_data,
@@ -175,10 +165,8 @@ wide_data <- pivot_wider(
   names_prefix = "response_"
 )
 
-
 # Convert study_cond to a factor
 wide_data$study_cond <- as.factor(wide_data$study_cond)
-
 
 # Homogeneity of covariances assumption
 # Perform Box's M test
@@ -229,10 +217,9 @@ pwc2 <- combined_filtered_reaction_time_data %>%
   select(-df, -statistic, -p) # Remove details
 print_and_save_table(pwc2, "\nTable 5: Pairwise Comparisons by Study Condition")
 
-
 # Calculate and save statistics for each condition
-calculate_stats(collect_cond_1_filtered$median_reaction_time, "Collect Request", "Customisation Condition")
-calculate_stats(collect_cond_0_filtered$median_reaction_time, "Collect Request", "Non-customisation Condition")
+calculate_stats(rt_cust_collect_requested_filtered$median_reaction_time, "Collect Request", "Customisation Condition")
+calculate_stats(rt_non_cust_collect_requested_filtered$median_reaction_time, "Collect Request", "Non-customisation Condition")
 
 # Count the number of participants after filtering for inflate request
 num_participants_inflate <- nrow(inflate_request_combined)
