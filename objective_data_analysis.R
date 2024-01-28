@@ -335,14 +335,38 @@ reaction_time_data <- dbGetQuery(conn, reaction_time_query)
 # Subset for robot_response = 1
 reaction_time_for_inflate_request <- subset(reaction_time_data, robot_response == 1)
 
-# Perform statistical analysis for inflate request
+# For Inflate Request - Study Condition 0
+inflate_cond_0 <- subset(reaction_time_for_inflate_request, study_cond == 0)
+mean_inflate_0 <- mean(inflate_cond_0$average_reaction_time)
+sd_inflate_0 <- sd(inflate_cond_0$average_reaction_time)
+inflate_cond_0_filtered <- subset(inflate_cond_0, average_reaction_time >= (mean_inflate_0 - 2 * sd_inflate_0) & average_reaction_time <= (mean_inflate_0 + 2 * sd_inflate_0))
 perform_shapiro_test(
-  reaction_time_for_inflate_request$average_reaction_time,
-  "Average Reaction Time for inflate request (Robot Response 1)"
+  inflate_cond_0_filtered$average_reaction_time,
+  "Shapiro-Wilk for Inflate Request, Study Condition 0"
 )
 
-perform_wilcox_rank_sum_test(
-  data = reaction_time_for_inflate_request,
+# For inflate Request - Study Condition 1
+inflate_cond_1 <- subset(reaction_time_for_inflate_request, study_cond == 1)
+mean_inflate_1 <- mean(inflate_cond_1$average_reaction_time)
+sd_inflate_1 <- sd(inflate_cond_1$average_reaction_time)
+inflate_cond_1_filtered <- subset(inflate_cond_1, average_reaction_time >= (mean_inflate_1 - 2 * sd_inflate_1) & average_reaction_time <= (mean_inflate_1 + 2 * sd_inflate_1))
+perform_shapiro_test(
+  inflate_cond_1_filtered$average_reaction_time,
+  "Shapiro-Wilk for Inflate Request, Study Condition 1"
+)
+
+inflate_request_combined <- rbind(inflate_cond_0_filtered, inflate_cond_1_filtered)
+
+inflate_request_combined$study_cond <- as.factor(inflate_request_combined$study_cond)
+
+# Levene's Test for Inflate Request
+perform_levene_test(
+  data = inflate_request_combined,
+  formula = average_reaction_time ~ study_cond
+)
+
+perform_t_test(
+  data = inflate_request_combined,
   formula = average_reaction_time ~ study_cond,
   "Average Reaction Time for inflate request (Robot Response 1)"
 )
@@ -350,43 +374,75 @@ perform_wilcox_rank_sum_test(
 # Subset for robot_response = 0
 reaction_time_for_collect_request <- subset(reaction_time_data, robot_response == 0)
 
-# Perform statistical analysis for collect request
+# For Collect Request - Study Condition 0
+collect_cond_0 <- subset(reaction_time_for_collect_request, study_cond == 0)
+mean_collect_0 <- mean(collect_cond_0$average_reaction_time)
+sd_collect_0 <- sd(collect_cond_0$average_reaction_time)
+collect_cond_0_filtered <- subset(collect_cond_0, average_reaction_time >= (mean_collect_0 - 2 * sd_collect_0) & average_reaction_time <= (mean_collect_0 + 2 * sd_collect_0))
 perform_shapiro_test(
-  reaction_time_for_collect_request$average_reaction_time,
-  "Average Reaction Time for collect request (Robot Response 0)"
+  collect_cond_0_filtered$average_reaction_time,
+  "Shapiro-Wilk for Collect Request, Study Condition 0"
 )
 
-perform_wilcox_rank_sum_test(
-  data = reaction_time_for_collect_request,
+qqPlot(collect_cond_0_filtered$average_reaction_time)
+
+# For Collect Request - Study Condition 1
+collect_cond_1 <- subset(reaction_time_for_collect_request, study_cond == 1)
+mean_collect_1 <- mean(collect_cond_1$average_reaction_time)
+sd_collect_1 <- sd(collect_cond_1$average_reaction_time)
+collect_cond_1_filtered <- subset(collect_cond_1, average_reaction_time >= (mean_collect_1 - 2 * sd_collect_1) & average_reaction_time <= (mean_collect_1 + 2 * sd_collect_1))
+perform_shapiro_test(
+  collect_cond_1_filtered$average_reaction_time,
+  "Shapiro-Wilk for Collect Request, Study Condition 1"
+)
+
+collect_request_combined <- rbind(collect_cond_0_filtered, collect_cond_1_filtered)
+
+collect_request_combined$study_cond <- as.factor(collect_request_combined$study_cond)
+
+# Levene's Test for Collect Request
+perform_levene_test(
+  data = collect_request_combined,
+  formula = average_reaction_time ~ study_cond
+)
+
+perform_welch_t_test(
+  data = collect_request_combined,
   formula = average_reaction_time ~ study_cond,
   "Average Reaction Time for collect request (Robot Response 0)"
 )
 
-calculate_vd_a(
-  reaction_time_for_collect_request,
-  "study_cond",
-  "average_reaction_time"
+hedges_g(
+  collect_cond_1_filtered$average_reaction_time,
+  collect_cond_0_filtered$average_reaction_time,
+  "Reaction time"
 )
 
-# Split the data by study condition
-customise_cond_data <- subset(reaction_time_for_collect_request, study_cond == 1)
-non_customise_cond_data <- subset(reaction_time_for_collect_request, study_cond == 0)
-
 # Calculate and save statistics for each condition
-calculate_stats(customise_cond_data$average_reaction_time, "Collect Request", "Customisation Condition")
-calculate_stats(non_customise_cond_data$average_reaction_time, "Collect Request", "Non-customisation Condition")
+calculate_stats(collect_cond_1_filtered$average_reaction_time, "Collect Request", "Customisation Condition")
+calculate_stats(collect_cond_0_filtered$average_reaction_time, "Collect Request", "Non-customisation Condition")
 
-# visualisation
-ggplot(reaction_time_for_collect_request, aes(x=average_reaction_time, y=factor(study_cond), fill=factor(study_cond))) +
-  geom_density_ridges(alpha=0.4, scale=0.6) +
-  geom_boxplot(aes(y=factor(study_cond), x=average_reaction_time), width=0.2, alpha=0.3) +
-  labs(title="Reaction time for Collect request by robot",
-       x="Average Reaction Time (seconds)",
-       y="Study Condition") +
+# Count the number of participants after filtering for inflate request
+num_participants_inflate = nrow(inflate_request_combined)
+print_and_save(paste("Number of participants remaining for inflate request (Robot Response 1):", num_participants_inflate))
+
+# Count the number of participants after filtering for collect request
+num_participants_collect = nrow(collect_request_combined)
+print_and_save(paste("Number of participants remaining for collect request (Robot Response 0):", num_participants_collect))
+
+# Visualisation
+ggplot(collect_request_combined, aes(x = average_reaction_time, y = factor(study_cond), fill = factor(study_cond))) +
+  geom_density_ridges(alpha = 0.4, scale = 0.6) +
+  geom_boxplot(aes(y = factor(study_cond), x = average_reaction_time), width = 0.2, alpha = 0.3) +
+  labs(
+    title = "Reaction time for Collect request by robot",
+    x = "Average Reaction Time (seconds)",
+    y = "Study Condition"
+  ) +
   theme_minimal() +
-  theme(legend.position = "none", plot.margin=margin(t=0.5, r=0.1, b=0.1, l=0.5, unit="cm")) +
+  theme(legend.position = "none", plot.margin = margin(t = 0.5, r = 0.1, b = 0.1, l = 0.5, unit = "cm")) +
   coord_flip() +
-  scale_y_discrete(expand=c(0, 0), labels=c("non-custom", "custom"))
+  scale_y_discrete(expand = c(0, 0), labels = c("non-custom", "custom"))
 
 ################################################################################
 print_and_save(
@@ -515,27 +571,48 @@ overall_avg_data <- dbGetQuery(conn, overall_avg_query)
 
 # Subset for inflate requests (robot_response = 1)
 inflate_request_data <- subset(overall_avg_data, robot_response == 1)
+mean_inflate_data <- mean(inflate_request_data$overall_avg_inflate_after_help)
+sd_inflate_data <- sd(inflate_request_data$overall_avg_inflate_after_help)
+inflate_data_filtered <- subset(inflate_request_data, overall_avg_inflate_after_help >= (mean_inflate_data - 2 * sd_inflate_data) & overall_avg_inflate_after_help <= (mean_inflate_data + 2 * sd_inflate_data))
+perform_shapiro_test(
+  inflate_data_filtered$overall_avg_inflate_after_help,
+  "Shapiro-Wilk for Inflate Request data, robot request 1"
+)
+
+qqPlot(inflate_data_filtered$overall_avg_inflate_after_help)
+
 # Subset for collect requests (robot_response = 0)
 collect_request_data <- subset(overall_avg_data, robot_response == 0)
+mean_collect_data <- mean(collect_request_data$overall_avg_inflate_after_help)
+sd_collect_data <- sd(collect_request_data$overall_avg_inflate_after_help)
+collect_data_filtered <- subset(collect_request_data, overall_avg_inflate_after_help >= (mean_collect_data - 2 * sd_collect_data) & overall_avg_inflate_after_help <= (mean_collect_data + 2 * sd_collect_data))
+perform_shapiro_test(
+  collect_data_filtered$overall_avg_inflate_after_help,
+  "Shapiro-Wilk for Collect Request data, robot request 0"
+)
+
+qqPlot(collect_data_filtered$overall_avg_inflate_after_help)
+
+combined_overall_avg_data <- rbind(inflate_data_filtered, collect_data_filtered)
 
 # Wilcoxon Signed-Rank Test
-perform_wilcoxon_signed_rank_test(
-  inflate_request_data$overall_avg_inflate_after_help,
-  collect_request_data$overall_avg_inflate_after_help,
+perform_mann_whitney(
+  inflate_data_filtered$overall_avg_inflate_after_help,
+  collect_data_filtered$overall_avg_inflate_after_help,
   "Difference in Inflate vs. Collect responses"
 )
 
 # Find the effect size
-perform_wilcoxon_signed_rank_cohens_d(
-  inflate_request_data$overall_avg_inflate_after_help,
-  collect_request_data$overall_avg_inflate_after_help,
+perform_cliffs_delta(
+  inflate_data_filtered$overall_avg_inflate_after_help,
+  collect_data_filtered$overall_avg_inflate_after_help,
   "Effect size for the difference in the response for inflate vs. collect, when playing with robot"
 )
 
-calculate_stats(inflate_request_data$overall_avg_inflate_after_help, "Inflate Request", "Robot requested inflate")
-calculate_stats(collect_request_data$overall_avg_inflate_after_help, "Collect Request", "Robot requested collect")
+calculate_stats(inflate_data_filtered$overall_avg_inflate_after_help, "Inflate Request", "Robot requested inflate")
+calculate_stats(collect_data_filtered$overall_avg_inflate_after_help, "Collect Request", "Robot requested collect")
 
-ggplot(overall_avg_data, aes(x=overall_avg_inflate_after_help, y=factor(robot_response), fill=factor(robot_response))) +
+ggplot(combined_overall_avg_data, aes(x=overall_avg_inflate_after_help, y=factor(robot_response), fill=factor(robot_response))) +
   geom_density_ridges(alpha=0.4, scale=0.5) +
   geom_boxplot(aes(y=factor(robot_response), x=overall_avg_inflate_after_help), width=0.2, alpha=0.3) +
   labs(x="Average Inflates After Requesting Help",
@@ -573,53 +650,47 @@ average_inflates_query <- "
 # Fetch reaction_time data
 inflates_data <- dbGetQuery(conn, average_inflates_query)
 
+game_one <- subset(inflates_data, game_round == 1)
+mean_game_one <- mean(game_one$average_balloon_inflate_per_game)
+sd_game_one <- sd(game_one$average_balloon_inflate_per_game)
+game_one_filtered <- subset(game_one, average_balloon_inflate_per_game >= (mean_game_one - 2 * sd_game_one) & average_balloon_inflate_per_game <= (mean_game_one + 2 * sd_game_one))
 perform_shapiro_test(
-  inflates_data$average_balloon_inflate_per_game[inflates_data$game_round == 1],
+  game_one_filtered$average_balloon_inflate_per_game,
   "average_balloon_inflate_per_game (Game Round 1)"
 )
 
+qqPlot(game_one_filtered$average_balloon_inflate_per_game)
+
+game_two <- subset(inflates_data, game_round == 2)
+mean_game_two <- mean(game_two$average_balloon_inflate_per_game)
+sd_game_two <- sd(game_two$average_balloon_inflate_per_game)
+game_two_filtered <- subset(game_two, average_balloon_inflate_per_game >= (mean_game_two - 2 * sd_game_two) & average_balloon_inflate_per_game <= (mean_game_two + 2 * sd_game_two))
 perform_shapiro_test(
-  inflates_data$average_balloon_inflate_per_game[inflates_data$game_round == 2],
+  game_two_filtered$average_balloon_inflate_per_game,
   "average_balloon_inflate_per_game (Game Round 2)"
 )
 
-# The data set violates the assumption of normality
+qqPlot(game_two_filtered$average_balloon_inflate_per_game)
 
-# Exclude study_cond from the reshaping process
-inflates_data <- inflates_data[, !names(inflates_data) %in% c("total_inflates", "count_num_of_balloons")]
+combined_overall_game_data <- rbind(game_one_filtered, game_two_filtered)
 
-# Reshaping the data to wide format
-reshaped_average_inflates_data <- reshape(
-  inflates_data,
-  idvar = "player_id",
-  timevar = "game_round",
-  direction = "wide"
-)
-
-# Renaming the columns for clarity
-names(reshaped_average_inflates_data)[names(reshaped_average_inflates_data) == "average_balloon_inflate_per_game.1"] <-
-  "avg_inflate_for_game_one"
-names(reshaped_average_inflates_data)[names(reshaped_average_inflates_data) == "average_balloon_inflate_per_game.2"] <-
-  "avg_inflate_for_game_two"
-
-# Wilcoxon Signed-Rank Test
-perform_wilcoxon_signed_rank_test(
-  reshaped_average_inflates_data$avg_inflate_for_game_one,
-  reshaped_average_inflates_data$avg_inflate_for_game_two,
+perform_paired_t_test(
+  data = combined_overall_game_data,
+  formula = average_balloon_inflate_per_game ~ game_round,
   "Average inflate per game"
 )
 
 # Find the effect size
-perform_wilcoxon_signed_rank_cohens_d(
-  reshaped_average_inflates_data$avg_inflate_for_game_one,
-  reshaped_average_inflates_data$avg_inflate_for_game_two,
+perform_cohens_d_paired(
+  game_one_filtered$average_balloon_inflate_per_game,
+  game_two_filtered$average_balloon_inflate_per_game,
   "Overall risk taking behaviour"
 )
 
-calculate_stats(reshaped_average_inflates_data$avg_inflate_for_game_one, "total inflates for game 1", "Game round 1")
-calculate_stats(reshaped_average_inflates_data$avg_inflate_for_game_two, "total inflates for game 2", "Game round 2")
+calculate_stats(game_one_filtered$average_balloon_inflate_per_game, "total inflates for game 1", "Game round 1")
+calculate_stats(game_two_filtered$average_balloon_inflate_per_game, "total inflates for game 2", "Game round 2")
 
-ggplot(inflates_data, aes(x=average_balloon_inflate_per_game, y=factor(game_round), fill=factor(game_round))) +
+ggplot(combined_overall_game_data, aes(x=average_balloon_inflate_per_game, y=factor(game_round), fill=factor(game_round))) +
   geom_density_ridges(alpha=0.4, scale=0.5) +
   geom_boxplot(aes(y=factor(game_round), x=average_balloon_inflate_per_game), width=0.2, alpha=0.3) +
   labs(x="Average Inflates per game",
