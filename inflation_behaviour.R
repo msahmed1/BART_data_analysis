@@ -298,3 +298,5 @@ print_and_save(paste("Number of participants remaining for inflate request (Robo
 num_participants_collect <- nrow(collect_request_combined)
 print_and_save(paste("Number of participants remaining for collect request (Robot Response 0):", num_participants_collect))
 
+# Close the database connection
+dbDisconnect(conn)

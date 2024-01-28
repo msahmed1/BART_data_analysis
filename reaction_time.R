@@ -258,3 +258,6 @@ ggplot(inflate_request_combined, aes(x = median_reaction_time, y = factor(study_
   theme(legend.position = "none", plot.margin = margin(t = 0.5, r = 0.1, b = 0.1, l = 0.5, unit = "cm")) +
   coord_flip() +
   scale_y_discrete(expand = c(0, 0), labels = c("non-custom", "custom"))
+
+# Close the database connection
+dbDisconnect(conn)
