@@ -11,3 +11,10 @@
 /reaction_time_results.txt
 /survey_data_analysis_results.txt
 /time_to_decide.png
+wide_format_reaction_times.csv
+QQplot_collect_reaction_times.png
+median_reaction_time.png
+mdn_reaction_time_dist.png
+mdn_reaction_time_dist_outlier.png
+inflation_behaviour_results.txt
+avg_reaction_time_dist.png
