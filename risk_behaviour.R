@@ -101,6 +101,10 @@ perform_levene_test(
   formula = average_balloon_inflate_per_game ~ game_round
 )
 
+print_and_save(
+  "\n############################## Non-parametric test ##############################" 
+)
+
 perform_paired_t_test(
   data = combined_overall_game_data,
   formula = average_balloon_inflate_per_game ~ game_round,
@@ -112,6 +116,10 @@ perform_cohens_d_paired(
   game_one_filtered$average_balloon_inflate_per_game,
   game_two_filtered$average_balloon_inflate_per_game,
   "Overall risk taking behaviour"
+)
+
+print_and_save(
+  "############################ Descriptive statistics ############################" 
 )
 
 calculate_stats(game_one_filtered$average_balloon_inflate_per_game, "total inflates for game 1", "Game round 1")
@@ -241,8 +249,8 @@ ggplot(combined_overall_sutdy_cond_data, aes(x = overall_avg_inflate_after_help,
   geom_boxplot(aes(y = factor(study_cond), x = overall_avg_inflate_after_help), width = 0.2, alpha = 0.3) +
   geom_jitter(height = 0.1, size = 1, alpha = 0.5, color = "black") +
   labs(
-    title = "Avg inflates for Inflate request by robot",
-    x = "avg inflates after help requested",
+    title = "Avg inflates after requesting help from robot per study condition",
+    x = "Avg inflates after help requested",
     y = "Study Condition"
   ) +
   theme_minimal() +
