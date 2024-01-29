@@ -28,7 +28,7 @@ conn <- dbConnect(RSQLite::SQLite(), dbname = db_path)
 
 ################################################################################
 print_and_save(
-  "\n\n#### Is there a difference in median reaction time between robot responses? ####"
+  "#### Is there a difference in median reaction time between robot responses? ####"
 )
 ################################################################################
 
@@ -157,6 +157,10 @@ combined_filtered_reaction_time_data <- rbind(inflate_request_combined, collect_
 
 combined_filtered_reaction_time_data$robot_response <- as.factor(combined_filtered_reaction_time_data$robot_response)
 
+print_and_save(
+  "################################ Parametric test ################################" 
+)
+
 # Reshape data into wide format
 wide_data <- pivot_wider(
   data = combined_filtered_reaction_time_data,
@@ -216,6 +220,10 @@ pwc2 <- combined_filtered_reaction_time_data %>%
   ) %>%
   select(-df, -statistic, -p) # Remove details
 print_and_save_table(pwc2, "\nTable 5: Pairwise Comparisons by Study Condition")
+
+print_and_save(
+  "\n############################ Descriptive statistics ############################" 
+)
 
 # Calculate and save statistics for each condition
 calculate_stats(rt_cust_collect_requested_filtered$median_reaction_time, "Collect Request", "Customisation Condition")
