@@ -9,13 +9,9 @@ if (!require(RSQLite)) {
 if (!require(tidyr)) {
   install.packages("tidyr")
 }
-if (!require(rstatix)) {
-  install.packages("rstatix")
-}
 library(DBI)
 library(RSQLite)
 library(tidyr)
-library(rstatix)
 
 # File to save output
 output_file <- "reaction_time_results.txt"
@@ -192,24 +188,10 @@ res.aov <- anova_test(
 anova_table <- get_anova_table(res.aov)
 print_and_save_table(anova_table, "\nTable 1: Mixed ANOVA ")
 
-one.way <- combined_filtered_reaction_time_data %>%
-  group_by(robot_response) %>%
-  anova_test(dv = median_reaction_time, wid = player_id, between = study_cond) %>%
-  get_anova_table() %>%
-  adjust_pvalue(method = "bonferroni")
-print_and_save_table(one.way, "\nTable 2: Separate ANOVAs by Robot Response")
-
 pwc <- combined_filtered_reaction_time_data %>%
   group_by(robot_response) %>%
   pairwise_t_test(median_reaction_time ~ study_cond, p.adjust.method = "bonferroni")
-print_and_save_table(pwc, "\nTable 3: Pairwise Comparisons by Robot Response")
-
-one.way2 <- combined_filtered_reaction_time_data %>%
-  group_by(study_cond) %>%
-  anova_test(dv = median_reaction_time, wid = player_id, within = robot_response) %>%
-  get_anova_table() %>%
-  adjust_pvalue(method = "bonferroni")
-print_and_save_table(one.way2, "\nTable 4: Separate ANOVAs by Study Condition")
+print_and_save_table(pwc, "\nTable 2: Pairwise Comparisons by Robot Response")
 
 pwc2 <- combined_filtered_reaction_time_data %>%
   group_by(study_cond) %>%
@@ -219,7 +201,7 @@ pwc2 <- combined_filtered_reaction_time_data %>%
     p.adjust.method = "bonferroni"
   ) %>%
   select(-df, -statistic, -p) # Remove details
-print_and_save_table(pwc2, "\nTable 5: Pairwise Comparisons by Study Condition")
+print_and_save_table(pwc2, "\nTable 3: Pairwise Comparisons by Study Condition")
 
 print_and_save(
   "\n############################ Descriptive statistics ############################" 
@@ -237,35 +219,28 @@ print_and_save(paste("Number of participants remaining for inflate request (Robo
 num_participants_collect <- nrow(collect_request_combined)
 print_and_save(paste("Number of participants remaining for collect request (Robot Response 0):", num_participants_collect))
 
-# generate a raincloud plot without displaing the data points
-ggplot(collect_request_combined, aes(x = median_reaction_time, y = factor(study_cond), fill = factor(study_cond))) +
-  geom_density_ridges(alpha = 0.4, scale = 0.6) +
-  geom_boxplot(aes(y = factor(study_cond), x = median_reaction_time), width = 0.2, alpha = 0.3) +
-  # geom_jitter(height=0.1, size=1, alpha=0.5, color="black") +
-  labs(
-    title = "Median Reaction time for Collect request by robot",
-    x = "Median Reaction Time (seconds)",
-    y = "Study Condition"
-  ) +
-  theme_minimal() +
-  theme(legend.position = "none", plot.margin = margin(t = 0.5, r = 0.1, b = 0.1, l = 0.5, unit = "cm")) +
-  coord_flip() +
-  scale_y_discrete(expand = c(0, 0), labels = c("non-custom", "custom"))
+# Ensure the data is in the correct format and add descriptive labels
+combined_filtered_reaction_time_data$study_cond_label <- ifelse(combined_filtered_reaction_time_data$study_cond == 0, "Non-Customise", "Customise")
+combined_filtered_reaction_time_data$robot_response_label <- ifelse(combined_filtered_reaction_time_data$robot_response == 0, "Collect", "Inflate")
 
-# generate a raincloud plot without displaing the data points
-ggplot(inflate_request_combined, aes(x = median_reaction_time, y = factor(study_cond), fill = factor(study_cond))) +
+# Combine the labels for a comprehensive y-axis label
+combined_filtered_reaction_time_data$combined_label <- paste(combined_filtered_reaction_time_data$robot_response_label, combined_filtered_reaction_time_data$study_cond_label, sep = " - ")
+
+# Create the plot
+ggplot(combined_filtered_reaction_time_data, aes(x = median_reaction_time, y = combined_label, fill = study_cond_label)) +
   geom_density_ridges(alpha = 0.4, scale = 0.6) +
-  geom_boxplot(aes(y = factor(study_cond), x = median_reaction_time), width = 0.2, alpha = 0.3) +
-  # geom_jitter(height=0.1, size=1, alpha=0.5, color="black") +
+  geom_boxplot(aes(y = combined_label, x = median_reaction_time), width = 0.2, alpha = 0.3) +
   labs(
-    title = "Median Reaction time for Inflate request by robot",
+    title = "Median Reaction Time by Study Condition and Robot Response",
     x = "Median Reaction Time (seconds)",
-    y = "Study Condition"
+    y = "Condition"
   ) +
   theme_minimal() +
-  theme(legend.position = "none", plot.margin = margin(t = 0.5, r = 0.1, b = 0.1, l = 0.5, unit = "cm")) +
-  coord_flip() +
-  scale_y_discrete(expand = c(0, 0), labels = c("non-custom", "custom"))
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    legend.position = "right"
+  ) +
+  coord_flip()
 
 # Close the database connection
 dbDisconnect(conn)
