@@ -9,13 +9,9 @@ if (!require(RSQLite)) {
 if (!require(tidyr)) {
   install.packages("tidyr")
 }
-if (!require(rstatix)) {
-  install.packages("rstatix")
-}
 library(DBI)
 library(RSQLite)
 library(tidyr)
-library(rstatix)
 
 # File to save output
 output_file <- "compliance_behaviour_results.txt"
@@ -80,51 +76,149 @@ normalised_compliance_data <- merge(total_compliance, count_responses,
 # Calculate normalised compliance and store it in the "normalised_compliance" column
 normalised_compliance_data$normalised_compliance <- normalised_compliance_data$total_compliance / normalised_compliance_data$count_response
 
+# Subset the data for when robot_response is 0 (collect request)
+collect_request_data <- subset(normalised_compliance_data, robot_response == 0)
+
 # Subset the data for when robot_response is 1 (inflate request) i.e. don't include data for robot_response == 0
 inflate_request_data <- subset(normalised_compliance_data, robot_response == 1)
+mean_inflate_request_data <- mean(inflate_request_data$normalised_compliance)
+sd_inflate_request_data <- sd(inflate_request_data$normalised_compliance)
+inflate_request_data_filtered <- subset(inflate_request_data, normalised_compliance >= (mean_inflate_request_data - 2 * sd_inflate_request_data) & normalised_compliance <= (mean_inflate_request_data + 2 * sd_inflate_request_data))
+
+collect_request_data <- subset(normalised_compliance_data, robot_response == 0)
+mean_collect_request_data <- mean(collect_request_data$normalised_compliance)
+sd_collect_request_data <- sd(collect_request_data$normalised_compliance)
+collect_request_data_filtered <- subset(collect_request_data, normalised_compliance >= (mean_collect_request_data - 2 * sd_collect_request_data) & normalised_compliance <= (mean_collect_request_data + 2 * sd_collect_request_data))
+
+# Find excluded participants for each study conditions
+excluded_inflate_request_data_ppt <- setdiff(inflate_request_data$player_id, inflate_request_data_filtered$player_id)
+excluded_collect_request_data_ppt <- setdiff(collect_request_data$player_id, collect_request_data_filtered$player_id)
+
+# Combine excluded participant lists for each set of conditions
+all_excluded_from_both_inflate_reqs_ppt <- unique(c(excluded_inflate_request_data_ppt, excluded_collect_request_data_ppt))
+
+# Exclude these participants from respective datasets
+inflate_request_data_filtered <- inflate_request_data_filtered[!inflate_request_data_filtered$player_id %in% all_excluded_from_both_inflate_reqs_ppt, ]
+collect_request_data_filtered <- collect_request_data_filtered[!collect_request_data_filtered$player_id %in% all_excluded_from_both_inflate_reqs_ppt, ]
+
+combined_overall_game_data <- rbind(inflate_request_data_filtered, collect_request_data_filtered)
+
+combined_overall_game_data$study_cond <- as.factor(combined_overall_game_data$study_cond)
+
+inflate_request_data_study_0 <- subset(inflate_request_data_filtered, study_cond == 0)
+perform_shapiro_test(
+  inflate_request_data_study_0$normalised_compliance,
+  "inflate_request_data_filtered for inflate req (Robot Response 1) in non-custum cond. (study_cond = 0)"
+)
+
+inflate_request_data_study_1 <- subset(inflate_request_data_filtered, study_cond == 1)
+perform_shapiro_test(
+  inflate_request_data_study_1$normalised_compliance,
+  "inflate_request_data_filtered for inflate req (Robot Response 1) in custum cond. (study_cond = 1)"
+)
+
+qqPlot(inflate_request_data_filtered$normalised_compliance)
 
 perform_shapiro_test(
-  inflate_request_data$normalised_compliance,
-  "normalised_compliance_data (Robot Response 1)"
+  collect_request_data_filtered$normalised_compliance,
+  "normalised_compliance_data for collect req (Robot Response 0)"
+)
+
+collect_request_data_study_0 <- subset(collect_request_data_filtered, study_cond == 0)
+perform_shapiro_test(
+  collect_request_data_study_0$normalised_compliance,
+  "collect_request_data_filtered for colect req (Robot Response 0) in non-custum cond. (study_cond = 0)"
+)
+
+collect_request_data_study_1 <- subset(collect_request_data_filtered, study_cond == 1)
+perform_shapiro_test(
+  collect_request_data_study_1$normalised_compliance,
+  "collect_request_data_filtered for collect req (Robot Response 0) in custum cond. (study_cond = 1)"
+)
+
+qqPlot(collect_request_data_filtered$normalised_compliance)
+
+# Levene's Test for Inflate Request
+perform_levene_test(
+  data = combined_overall_game_data,
+  formula = normalised_compliance ~ study_cond
+)
+
+inflate_request_data_filtered$study_cond <- as.factor(inflate_request_data_filtered$study_cond)
+
+# Levene's Test for Inflate Request
+perform_levene_test(
+  data = inflate_request_data_filtered,
+  formula = normalised_compliance ~ study_cond
+)
+
+collect_request_data_filtered$study_cond <- as.factor(collect_request_data_filtered$study_cond)
+
+# Levene's Test for Inflate Request
+perform_levene_test(
+  data = collect_request_data_filtered,
+  formula = normalised_compliance ~ study_cond
+)
+
+perform_wilcox_rank_sum_test(
+  data = combined_overall_game_data,
+  formula = normalised_compliance ~ study_cond,
+  "Normalised Compliance between study conditions"
 )
 
 # The data set violates the assumption of normality, use Wilcox Rank Sum test as it is equivalent independent samples t-test
 # Perform the Wilcoxon rank sum test for inflate requests
 perform_wilcox_rank_sum_test(
-  data = inflate_request_data,
+  data = inflate_request_data_filtered,
   formula = normalised_compliance ~ study_cond,
-  "Normalised Compliance for Inflate Request"
-)
-
-# Subset the data for when robot_response is 0 (collect request)
-collect_request_data <- subset(normalised_compliance_data, robot_response == 0)
-
-perform_shapiro_test(
-  collect_request_data$normalised_compliance,
-  "normalised_compliance_data (Robot Response 0)"
+  "compare compliance for Inflate Request between study cond"
 )
 
 # Perform the Wilcoxon rank sum test for collect requests
 perform_wilcox_rank_sum_test(
-  data = collect_request_data,
+  data = collect_request_data_filtered,
   formula = normalised_compliance ~ study_cond,
-  "Normalised Compliance for Collect Request"
+  "compare compliance for Collect Request between study cond"
 )
 
-ggplot(collect_request_data, aes(x = normalised_compliance, y = factor(study_cond), fill = factor(study_cond))) +
-  geom_density_ridges(alpha = 0.4, scale = 0.6) +
-  geom_boxplot(aes(y = factor(study_cond), x = normalised_compliance), width = 0.2, alpha = 0.3) +
-  geom_jitter(height=0.1, size=1, alpha=0.5, color="black") +
-  labs(
-    title = "Compliance",
-    x = "avg inflates after help requested",
-    y = "Study Condition"
-  ) +
-  theme_minimal() +
-  theme(legend.position = "none", plot.margin = margin(t = 0.5, r = 0.1, b = 0.1, l = 0.5, unit = "cm")) +
-  coord_flip() +
-  # scale_y_discrete(expand = c(0, 0), labels = c("non-custom", "custom"))
+perform_wilcoxon_signed_rank_test(
+  collect_request_data_filtered$normalised_compliance,
+  inflate_request_data_filtered$normalised_compliance,
+  "normalised Compliance based on robot request regardless of study condition"
+)
 
+calculate_wilcoxon_effect_size(
+  data = combined_overall_game_data,
+  formula = normalised_compliance ~ robot_response
+)
+
+# Ensure the data is in the correct format and add descriptive labels
+combined_overall_game_data <- combined_overall_game_data %>%
+mutate(study_cond = as.factor(ifelse(study_cond == 0, "Non-Customise", "Customise")),
+       robot_response = as.factor(ifelse(robot_response == 0, "Collect", "Inflate")))
+
+# Calculate means and SEM
+grouped_data <- combined_overall_game_data %>%
+  group_by(study_cond, robot_response) %>%
+  summarise(mean = mean(normalised_compliance),
+            sem = sd(normalised_compliance) / sqrt(n()), .groups = 'drop')
+
+# Set the position for dodge (adjust width as needed)
+dodge <- position_dodge(width = 0.8)
+
+# Create the bar plot with error bars
+ggplot(grouped_data, aes(x = robot_response, y = mean, fill = study_cond)) +
+  geom_bar(stat = "identity", position = dodge) +
+  geom_errorbar(aes(ymin = mean - sem, ymax = mean + sem, group = study_cond),
+                width = 0.25, position = dodge) +
+  labs(title = "Compliance by Study Condition and Robot Response",
+       x = "Robot Response",
+       y = "Normalised Compliance",
+       fill = "Study Condition") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_x_discrete(labels = c("Collect", "Inflate"))
+  
 ################################################################################
 print_and_save(
   "\n\n### Is there a difference in inflammation behaviours after receiving a suggestion? ###"
@@ -360,34 +454,28 @@ perform_wilcox_rank_sum_test(
 
 print_and_save(
   "For the game played with the robot, is there a difference in how much the participant inflated the
-  \nballoon after they received a inflates or collects request from the robot, regardless of the study condition"
+  balloon after they received a inflates or collects request from the robot, regardless of the study condition"
 )
 
 # Wilcoxon Signed-Rank Test
-perform_mann_whitney(
+perform_wilcoxon_signed_rank_test(
   inflate_request_combined$avg_inflate_after_help,
   collect_request_combined$avg_inflate_after_help,
   "inflation behaviour for based on the request made by the robot, regardless of study condition"
 )
 
-# Find the effect size
-perform_cliffs_delta(
-  inflate_request_combined$avg_inflate_after_help,
-  collect_request_combined$avg_inflate_after_help,
-  "Effect size for the inflation behaviour for inflate vs. collect, when playing with robot"
+calculate_wilcoxon_effect_size(
+  data = combined_filtered_inflation_data,
+  formula = avg_inflate_after_help ~ robot_response
 )
 
 print_and_save(
   "############################ Descriptive statistics ############################" 
 )
 
-# Calculate and save statistics for each condition
-calculate_stats(cust_collect_requested_filtered$avg_inflate_after_help, "Collect Request", "Customisation Condition")
-calculate_stats(non_cust_collect_requested_filtered$avg_inflate_after_help, "Collect Request", "Non-customisation Condition")
-
-# Calculate and save statistics for each condition
-calculate_stats(cust_inflate_requested_filtered$avg_inflate_after_help, "Inflate Request", "Customisation Condition")
-calculate_stats(non_cust_inflate_requested_filtered$avg_inflate_after_help, "Inflate Request", "Non-customisation Condition")
+# Calculate and save statistics for each robot response
+calculate_stats(inflate_request_combined$avg_inflate_after_help, "avg inflate", "Inflate request")
+calculate_stats(collect_request_combined$avg_inflate_after_help, "avg inflate", "Collect request")
 
 # Count the number of participants after filtering for inflate request
 num_participants_inflate <- nrow(inflate_request_combined)
