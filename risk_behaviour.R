@@ -227,6 +227,7 @@ calculate_stats(game_two_filtered$average_balloon_inflate_per_game, "total infla
 ggplot(combined_overall_game_data, aes(x = average_balloon_inflate_per_game, y = factor(game_round), fill = factor(game_round))) +
   geom_density_ridges(alpha = 0.4, scale = 0.5) +
   geom_boxplot(aes(y = factor(game_round), x = average_balloon_inflate_per_game), width = 0.2, alpha = 0.3) +
+  geom_jitter(height=0.1, size=0.5, alpha=0.4, color="black") +
   labs(
     x = "Average Inflates per game",
     y = "Game round"
