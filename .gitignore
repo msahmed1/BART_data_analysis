@@ -2,19 +2,4 @@
 /.RData
 /.Rhistory
 /.Rproj.user
-/average time to decide rain cloud.png
-/average_inflates_per_game.png
-/demographic_analysis_results.txt
-/inflates_after_robot_suggestion.png
-/objective_data_analysis_results.txt
-/reaction_time.png
-/reaction_time_results.txt
-/survey_data_analysis_results.txt
-/time_to_decide.png
-wide_format_reaction_times.csv
-QQplot_collect_reaction_times.png
-median_reaction_time.png
-mdn_reaction_time_dist.png
-mdn_reaction_time_dist_outlier.png
-inflation_behaviour_results.txt
-avg_reaction_time_dist.png
+
