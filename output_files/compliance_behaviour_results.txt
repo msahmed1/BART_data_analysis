@@ -1,0 +1,101 @@
+######### Is there a difference in compliance between study conditions? ######### 
+
+Shapiro-Wilk normality test for normalised_compliance_data for collect req (Robot Response 0) 
+ W = 0.87878 p-value = 2e-05 
+
+Shapiro-Wilk normality test for collect_request_data for colect req (Robot Response 0) in non-custum cond. (study_cond = 0) 
+ W = 0.83462 p-value = 0.00024 
+
+Shapiro-Wilk normality test for collect_request_data for collect req (Robot Response 0) in custum cond. (study_cond = 1) 
+ W = 0.91679 p-value = 0.01942 
+
+Wilcoxon Signed-Rank Test for normalised Compliance based on robot request regardless of study condition - p-value = 1.36939489216988e-07 
+Number of ties in the data: 23 
+Number of zero differences: 10 
+
+Wilcoxon effect size (r):  0.704275174704744 
+
+
+
+### Is there a difference in inflammation behaviours after receiving a suggestion? ### 
+
+Shapiro-Wilk normality test for Shapiro-Wilk for Inflate Request, Study Condition 0 
+ W = 0.90974 p-value = 0.01949 
+
+Shapiro-Wilk normality test for Shapiro-Wilk for Inflate Request, Study Condition 1 
+ W = 0.95445 p-value = 0.25578 
+
+Shapiro-Wilk normality test for Shapiro-Wilk for Collect Request, Study Condition 1 
+ W = 0.8567 p-value = 0.00128 
+
+Shapiro-Wilk normality test for Shapiro-Wilk for Collect Request, Study Condition 0 
+ W = 0.71908 p-value = 1e-05 
+
+Levene's Test for Homogeneity of Variance
+ F value: 0.13029 p-value: 0.71954 
+
+################################ Parametric test ################################ 
+
+
+Table 1: Mixed ANOVA 
+ANOVA Table (type II tests)
+
+                     Effect DFn DFd       F        p p<.05   ges
+1                study_cond   1  54   0.826 3.68e-01       0.009
+2            robot_response   1  54 125.425 1.07e-15     * 0.467
+3 study_cond:robot_response   1  54   0.819 3.70e-01       0.006
+
+Table 2: Pairwise Comparisons by Robot Response
+# A tibble: 2 × 10
+  robot_response .y.                    group1 group2    n1    n2     p p.signif p.adj p.adj.signif
+* <fct>          <chr>                  <chr>  <chr>  <int> <int> <dbl> <chr>    <dbl> <chr>       
+1 0              avg_inflate_after_help 0      1         28    28 0.813 ns       0.813 ns          
+2 1              avg_inflate_after_help 0      1         28    28 0.309 ns       0.309 ns          
+
+Table 3: Pairwise Comparisons by Study Condition
+# A tibble: 2 × 8
+  study_cond .y.                    group1 group2    n1    n2         p.adj p.adj.signif
+  <fct>      <chr>                  <chr>  <chr>  <int> <int>         <dbl> <chr>       
+1 0          avg_inflate_after_help 0      1         28    28 0.00000000271 ****        
+2 1          avg_inflate_after_help 0      1         28    28 0.0000000437  ****        
+
+############################## Non-parametric test ############################## 
+
+Wilcoxon Rank Sum for  inflation behaviour between Study Conditions - p-value = 0.59809 
+(approximation due to ties) 
+
+Wilcoxon Rank Sum for  inflation behaviour after help when the robot requests a inflate - p-value = 0.24092 
+(approximation due to ties) 
+
+Wilcoxon Rank Sum for  inflation behaviour after help when the robot requests a collect - p-value = 0.82399 
+(approximation due to ties) 
+
+For the game played with the robot, is there a difference in how much the participant inflated the
+  balloon after they received a inflates or collects request from the robot, regardless of the study condition 
+
+Wilcoxon Signed-Rank Test for inflation behaviour for based on the request made by the robot, regardless of study condition - p-value = 1.81617423086953e-10 
+Number of ties in the data: 1 
+Number of zero differences: 1 
+
+Wilcoxon effect size (r):  0.857872805661032 
+
+############################ Descriptive statistics ############################ 
+
+
+Descriptive Statistics for Inflate request ( avg inflate ):
+ Mean:  2.18901069168926 
+ Median:  2 
+ IQR:  1.45227272727273 
+ Standard Deviation:  1.11865695505735 
+
+
+Descriptive Statistics for Collect request ( avg inflate ):
+ Mean:  0.531244202226345 
+ Median:  0.316666666666667 
+ IQR:  0.618731962481962 
+ Standard Deviation:  0.608301183445689 
+
+Number of participants remaining for inflate request (Robot Response 1): 56 
+
+Number of participants remaining for collect request (Robot Response 0): 56 
+

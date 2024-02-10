@@ -1,0 +1,55 @@
+## Is there a difference in overall average inflates between study conditions? ## 
+
+for the game played with the robot, is there a difference in average inflates between the two study conditions? 
+
+Shapiro-Wilk normality test for overall_avg_inflate_after_help for customised condition 
+ W = 0.94653 p-value = 0.13637 
+
+Shapiro-Wilk normality test for overall_avg_inflate_after_help non-customise condition 
+ W = 0.87354 p-value = 0.00241 
+
+Levene's Test for Homogeneity of Variance
+ F value: 0.00193 p-value: 0.96513 
+
+Wilcoxon Rank Sum for  avg Inflates between study condition - p-value = 0.1497 
+(approximation due to ties) 
+
+
+
+######### Is there a difference in risk taking behaviour from baseline? ######## 
+
+Shapiro-Wilk normality test for average_balloon_inflate_per_game (Game Round 1) 
+ W = 0.98424 p-value = 0.6519 
+
+Shapiro-Wilk normality test for average_balloon_inflate_per_game (Game Round 2) 
+ W = 0.98401 p-value = 0.64034 
+
+Levene's Test for Homogeneity of Variance
+ F value: 0.13882 p-value: 0.71017 
+
+
+############################## Non-parametric test ############################## 
+
+Paired Samples t-test for Average inflate per game 
+t = -3.89371 df = 55 p-value = 0.00027 
+95% CI: -1.26478, -0.40524 
+Mean Estimates: -0.83501 
+
+Cohen's d for paired samples ( Overall risk taking behaviour ) - d_value = 0.52032 
+
+############################ Descriptive statistics ############################ 
+
+
+Descriptive Statistics for Game round 1 ( total inflates for game 1 ):
+ Mean:  12.6260273752296 
+ Median:  12.6770833333333 
+ IQR:  2.24621710526316 
+ Standard Deviation:  2.05148130842929 
+
+
+Descriptive Statistics for Game round 2 ( total inflates for game 2 ):
+ Mean:  13.4610356556744 
+ Median:  13.3333333333333 
+ IQR:  2.60681818181818 
+ Standard Deviation:  2.12833313592761 
+

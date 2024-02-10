@@ -1,0 +1,75 @@
+############################# Godspeed Likability ############################## 
+
+Shapiro-Wilk normality test for avg_likability (Customise Condition) 
+ W = 0.96725 p-value = 0.44674 
+
+Shapiro-Wilk normality test for avg_likability (Non-Customise Condition) 
+ W = 0.95822 p-value = 0.26166 
+
+Levene's Test for Homogeneity of Variance
+ F value: 1.8462 p-value: 0.17931 
+
+Two Sample t-test for Likability 
+t = -0.16163 df = 60 p-value = 0.87214 
+95% CI: -0.43147, 0.36695 
+Mean Estimates: 5.65806, 5.69032 
+
+############################ Godspeed Intelligence ############################# 
+
+Shapiro-Wilk normality test for avg_intelligence (Customise Condition) 
+ W = 0.97429 p-value = 0.64354 
+
+Shapiro-Wilk normality test for avg_intelligence (Non-Customise Condition) 
+ W = 0.94435 p-value = 0.10888 
+
+Levene's Test for Homogeneity of Variance
+ F value: 0.06657 p-value: 0.79728 
+
+Two Sample t-test for Intelligence 
+t = 0.10161 df = 60 p-value = 0.91941 
+95% CI: -0.48223, 0.53384 
+Mean Estimates: 4.8129, 4.7871 
+
+################################## Ownership ################################### 
+
+Shapiro-Wilk normality test for avg_ownership (Customise Condition) 
+ W = 0.97898 p-value = 0.78382 
+
+Shapiro-Wilk normality test for avg_ownership (Non-Customise Condition) 
+ W = 0.94232 p-value = 0.09569 
+
+Levene's Test for Homogeneity of Variance
+ F value: 0.037 p-value: 0.84811 
+
+Two Sample t-test for Ownership 
+t = -3.05653 df = 60 p-value = 0.00334 
+95% CI: -1.85012, -0.38644 
+Mean Estimates: 2.84946, 3.96774 
+
+Cohen's d Effect Size for  Ownership - d_value = 0.77636012520296 
+
+#################################### Trust ##################################### 
+
+Shapiro-Wilk normality test for avg_trustworthiness (Customise Condition) 
+ W = 0.9552 p-value = 0.21675 
+
+Shapiro-Wilk normality test for avg_trustworthiness (Non-Customise Condition) 
+ W = 0.94921 p-value = 0.1485 
+
+Levene's Test for Homogeneity of Variance
+ F value: 0.37754 p-value: 0.54125 
+
+Two Sample t-test for Trustworthiness 
+t = 0.08586 df = 60 p-value = 0.93187 
+95% CI: -0.57544, 0.62705 
+Mean Estimates: 4.36774, 4.34194 
+
+#################################### MANOVA #################################### 
+
+MANOVA Test for  combined customise and non-customise condition survey data - Summary
+            Df Pillai approx F num Df den Df  Pr(>F)  
+study_cond  1 0.1579    2.672      4     57 0.04104 *
+Residuals  60                                        
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
+

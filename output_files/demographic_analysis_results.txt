@@ -1,0 +1,11 @@
+Number of participants:  62 
+
+    age COUNT(*)
+1 18-25       19
+2 26-35       29
+3 36-45        8
+4 46-55        3
+5   56+        3 
+
+female :  19 , m :  1 , male :  40 , man :  1 , men :  1 , 
+

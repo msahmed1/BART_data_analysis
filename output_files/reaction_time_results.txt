@@ -1,0 +1,71 @@
+#### Is there a difference in median reaction time between robot responses? #### 
+
+Shapiro-Wilk normality test for Shapiro-Wilk for Inflate Request, Study Condition 0 
+ W = 0.98194 p-value = 0.89412 
+
+Shapiro-Wilk normality test for Shapiro-Wilk for Inflate Request, Study Condition 1 
+ W = 0.9796 p-value = 0.84069 
+
+Levene's Test for Homogeneity of Variance
+ F value: 0.0141 p-value: 0.90591 
+
+Shapiro-Wilk normality test for Shapiro-Wilk for Collect Request, Study Condition 1 
+ W = 0.82721 p-value = 0.00034 
+
+Shapiro-Wilk normality test for Shapiro-Wilk for Collect Request, Study Condition 0 
+ W = 0.97261 p-value = 0.65203 
+
+Levene's Test for Homogeneity of Variance
+ F value: 1.90668 p-value: 0.17302 
+
+################################ Parametric test ################################ 
+
+Cohen's f effect size for  : 0.127515342612668 
+
+Cohen's f effect size for  : 0.476438731665127 
+
+Cohen's f effect size for  : 0.19874868427499 
+
+
+Table 1: Mixed ANOVA 
+ANOVA Table (type II tests)
+
+                     Effect DFn DFd      F        p p<.05   ges  cohens_f
+1                study_cond   1  54  1.273 2.64e-01       0.016 0.1275153
+2            robot_response   1  54 41.756 3.07e-08     * 0.185 0.4764387
+3 study_cond:robot_response   1  54  7.151 1.00e-02     * 0.038 0.1987487
+
+Table 2: Pairwise Comparisons by Robot Response
+# A tibble: 2 × 10
+  robot_response .y.                  group1 group2    n1    n2      p p.signif  p.adj p.adj.signif
+* <fct>          <chr>                <chr>  <chr>  <int> <int>  <dbl> <chr>     <dbl> <chr>       
+1 0              median_reaction_time 0      1         28    28 0.0308 *        0.0308 *           
+2 1              median_reaction_time 0      1         28    28 0.583  ns       0.583  ns          
+
+Table 3: Pairwise Comparisons by Study Condition
+# A tibble: 2 × 8
+  study_cond .y.                  group1 group2    n1    n2     p.adj p.adj.signif
+  <fct>      <chr>                <chr>  <chr>  <int> <int>     <dbl> <chr>       
+1 0          median_reaction_time 0      1         28    28 0.000588  ***         
+2 1          median_reaction_time 0      1         28    28 0.0000165 ****        
+
+############################ Descriptive statistics ############################ 
+
+
+Descriptive Statistics for Customisation Condition ( Collect Request ):
+ Mean:  2.57537421428571 
+ Median:  2.49294625 
+ IQR:  0.2791015 
+ Standard Deviation:  0.493981296916965 
+
+
+Descriptive Statistics for Non-customisation Condition ( Collect Request ):
+ Mean:  2.34310053571429 
+ Median:  2.3310135 
+ IQR:  0.233105375 
+ Standard Deviation:  0.250986837696644 
+
+Number of participants remaining for inflate request (Robot Response 1): 56 
+
+Number of participants remaining for collect request (Robot Response 0): 56 
+
