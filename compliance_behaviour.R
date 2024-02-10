@@ -9,9 +9,17 @@ if (!require(RSQLite)) {
 if (!require(tidyr)) {
   install.packages("tidyr")
 }
+if (!require(ggplot2)) {
+  install.packages("ggplot2")
+}
+if (!require(dplyr)) {
+  install.packages("dplyr")
+}
 library(DBI)
 library(RSQLite)
 library(tidyr)
+library(ggplot2)
+library(dplyr)
 
 # File to save output
 output_file <- "compliance_behaviour_results.txt"
@@ -81,109 +89,76 @@ collect_request_data <- subset(normalised_compliance_data, robot_response == 0)
 
 # Subset the data for when robot_response is 1 (inflate request) i.e. don't include data for robot_response == 0
 inflate_request_data <- subset(normalised_compliance_data, robot_response == 1)
-mean_inflate_request_data <- mean(inflate_request_data$normalised_compliance)
-sd_inflate_request_data <- sd(inflate_request_data$normalised_compliance)
-inflate_request_data_filtered <- subset(inflate_request_data, normalised_compliance >= (mean_inflate_request_data - 2 * sd_inflate_request_data) & normalised_compliance <= (mean_inflate_request_data + 2 * sd_inflate_request_data))
-
 collect_request_data <- subset(normalised_compliance_data, robot_response == 0)
-mean_collect_request_data <- mean(collect_request_data$normalised_compliance)
-sd_collect_request_data <- sd(collect_request_data$normalised_compliance)
-collect_request_data_filtered <- subset(collect_request_data, normalised_compliance >= (mean_collect_request_data - 2 * sd_collect_request_data) & normalised_compliance <= (mean_collect_request_data + 2 * sd_collect_request_data))
 
-# Find excluded participants for each study conditions
-excluded_inflate_request_data_ppt <- setdiff(inflate_request_data$player_id, inflate_request_data_filtered$player_id)
-excluded_collect_request_data_ppt <- setdiff(collect_request_data$player_id, collect_request_data_filtered$player_id)
-
-# Combine excluded participant lists for each set of conditions
-all_excluded_from_both_inflate_reqs_ppt <- unique(c(excluded_inflate_request_data_ppt, excluded_collect_request_data_ppt))
-
-# Exclude these participants from respective datasets
-inflate_request_data_filtered <- inflate_request_data_filtered[!inflate_request_data_filtered$player_id %in% all_excluded_from_both_inflate_reqs_ppt, ]
-collect_request_data_filtered <- collect_request_data_filtered[!collect_request_data_filtered$player_id %in% all_excluded_from_both_inflate_reqs_ppt, ]
-
-combined_overall_game_data <- rbind(inflate_request_data_filtered, collect_request_data_filtered)
+combined_overall_game_data <- rbind(inflate_request_data, collect_request_data)
 
 combined_overall_game_data$study_cond <- as.factor(combined_overall_game_data$study_cond)
 
-inflate_request_data_study_0 <- subset(inflate_request_data_filtered, study_cond == 0)
-perform_shapiro_test(
-  inflate_request_data_study_0$normalised_compliance,
-  "inflate_request_data_filtered for inflate req (Robot Response 1) in non-custum cond. (study_cond = 0)"
-)
 
-inflate_request_data_study_1 <- subset(inflate_request_data_filtered, study_cond == 1)
-perform_shapiro_test(
-  inflate_request_data_study_1$normalised_compliance,
-  "inflate_request_data_filtered for inflate req (Robot Response 1) in custum cond. (study_cond = 1)"
-)
+inflate_non_cust_data <- subset(inflate_request_data, study_cond == 0)
+inflate_cust_data <- subset(inflate_request_data, study_cond == 1)
 
-qqPlot(inflate_request_data_filtered$normalised_compliance)
+# Combine the data frames and add a column to distinguish the datasets
+inflate_non_cust_data$dataset <- 'Non-Customise'
+inflate_cust_data$dataset <- 'Customise'
+combined_data <- rbind(inflate_non_cust_data, inflate_cust_data)
+
+# Convert the 'dataset' column to a factor for color coding
+combined_data$dataset <- as.factor(combined_data$dataset)
+
+# Create the Q-Q plot
+ggplot(combined_data, aes(sample = normalised_compliance, colour = dataset)) +
+  stat_qq(size = 4) +
+  geom_qq_line() +
+  labs(x = "Theoretical Quantiles",
+       y = "Sample Quantiles",
+       colour = "Study Condition") +
+  theme_minimal() +
+  scale_colour_manual(values = c("Non-Customise" = "blue", "Customise" = "red")) +
 
 perform_shapiro_test(
-  collect_request_data_filtered$normalised_compliance,
+  collect_request_data$normalised_compliance,
   "normalised_compliance_data for collect req (Robot Response 0)"
 )
 
-collect_request_data_study_0 <- subset(collect_request_data_filtered, study_cond == 0)
+collect_request_data_study_0 <- subset(collect_request_data, study_cond == 0)
 perform_shapiro_test(
   collect_request_data_study_0$normalised_compliance,
-  "collect_request_data_filtered for colect req (Robot Response 0) in non-custum cond. (study_cond = 0)"
+  "collect_request_data for colect req (Robot Response 0) in non-custum cond. (study_cond = 0)"
 )
 
-collect_request_data_study_1 <- subset(collect_request_data_filtered, study_cond == 1)
+collect_request_data_study_1 <- subset(collect_request_data, study_cond == 1)
 perform_shapiro_test(
   collect_request_data_study_1$normalised_compliance,
-  "collect_request_data_filtered for collect req (Robot Response 0) in custum cond. (study_cond = 1)"
+  "collect_request_data for collect req (Robot Response 0) in custum cond. (study_cond = 1)"
 )
 
-qqPlot(collect_request_data_filtered$normalised_compliance)
+collect_non_cust_data <- subset(collect_request_data, study_cond == 0)
+collect_cust_data <- subset(collect_request_data, study_cond == 1)
 
-# Levene's Test for Inflate Request
-perform_levene_test(
-  data = combined_overall_game_data,
-  formula = normalised_compliance ~ study_cond
-)
+# Combine the data frames and add a column to distinguish the datasets
+collect_non_cust_data$dataset <- 'Non-Custom'
+collect_cust_data$dataset <- 'Custom'
+combined_data <- rbind(collect_non_cust_data, collect_cust_data)
 
-inflate_request_data_filtered$study_cond <- as.factor(inflate_request_data_filtered$study_cond)
+# Convert the 'dataset' column to a factor for color coding
+combined_data$dataset <- as.factor(combined_data$dataset)
 
-# Levene's Test for Inflate Request
-perform_levene_test(
-  data = inflate_request_data_filtered,
-  formula = normalised_compliance ~ study_cond
-)
+# Create the Q-Q plot
+ggplot(combined_data, aes(sample = normalised_compliance, colour = dataset)) +
+  stat_qq(size = 4) +
+  geom_qq_line() +
+  labs(x = "Theoretical Quantiles",
+       y = "Sample Quantiles") +
+  theme_minimal() +
+  scale_colour_manual(values = c("Non-Custom" = "blue", "Custom" = "red"))
 
-collect_request_data_filtered$study_cond <- as.factor(collect_request_data_filtered$study_cond)
-
-# Levene's Test for Inflate Request
-perform_levene_test(
-  data = collect_request_data_filtered,
-  formula = normalised_compliance ~ study_cond
-)
-
-perform_wilcox_rank_sum_test(
-  data = combined_overall_game_data,
-  formula = normalised_compliance ~ study_cond,
-  "Normalised Compliance between study conditions"
-)
-
-# The data set violates the assumption of normality, use Wilcox Rank Sum test as it is equivalent independent samples t-test
-# Perform the Wilcoxon rank sum test for inflate requests
-perform_wilcox_rank_sum_test(
-  data = inflate_request_data_filtered,
-  formula = normalised_compliance ~ study_cond,
-  "compare compliance for Inflate Request between study cond"
-)
-
-# Perform the Wilcoxon rank sum test for collect requests
-perform_wilcox_rank_sum_test(
-  data = collect_request_data_filtered,
-  formula = normalised_compliance ~ study_cond,
-  "compare compliance for Collect Request between study cond"
-)
+collect_request_data$study_cond <- as.factor(collect_request_data$study_cond)
 
 perform_wilcoxon_signed_rank_test(
-  collect_request_data_filtered$normalised_compliance,
-  inflate_request_data_filtered$normalised_compliance,
+  collect_request_data$normalised_compliance,
+  inflate_request_data$normalised_compliance,
   "normalised Compliance based on robot request regardless of study condition"
 )
 
@@ -211,8 +186,7 @@ ggplot(grouped_data, aes(x = robot_response, y = mean, fill = study_cond)) +
   geom_bar(stat = "identity", position = dodge) +
   geom_errorbar(aes(ymin = mean - sem, ymax = mean + sem, group = study_cond),
                 width = 0.25, position = dodge) +
-  labs(title = "Compliance by Study Condition and Robot Response",
-       x = "Robot Response",
+  labs(x = "Robot Response",
        y = "Normalised Compliance",
        fill = "Study Condition") +
   theme_minimal() +
@@ -306,7 +280,7 @@ perform_shapiro_test(
   "Shapiro-Wilk for Inflate Request, Study Condition 0"
 )
 
-qqPlot(non_cust_inflate_requested_filtered$avg_inflate_after_help)
+# qqPlot(non_cust_inflate_requested_filtered$avg_inflate_after_help)
 
 perform_shapiro_test(
   cust_inflate_requested_filtered$avg_inflate_after_help,
@@ -316,12 +290,6 @@ perform_shapiro_test(
 inflate_request_combined <- rbind(non_cust_inflate_requested_filtered, cust_inflate_requested_filtered)
 
 inflate_request_combined$study_cond <- as.factor(inflate_request_combined$study_cond)
-
-# Levene's Test for Inflate Request
-perform_levene_test(
-  data = inflate_request_combined,
-  formula = avg_inflate_after_help ~ study_cond
-)
 
 perform_shapiro_test(
   cust_collect_requested_filtered$avg_inflate_after_help,
@@ -333,7 +301,7 @@ perform_shapiro_test(
   "Shapiro-Wilk for Collect Request, Study Condition 0"
 )
 
-qqPlot(non_cust_collect_requested_filtered$avg_inflate_after_help)
+# qqPlot(non_cust_collect_requested_filtered$avg_inflate_after_help)
 
 collect_request_combined <- rbind(non_cust_collect_requested_filtered, cust_collect_requested_filtered)
 
@@ -356,7 +324,6 @@ ggplot(collect_request_combined, aes(x = avg_inflate_after_help, y = factor(stud
   geom_boxplot(aes(y = factor(study_cond), x = avg_inflate_after_help), width = 0.2, alpha = 0.3) +
   geom_jitter(height=0.1, size=1, alpha=0.5, color="black") +
   labs(
-    title = "Avg inflates for Collect request by robot",
     x = "avg inflates after help requested",
     y = "Study Condition"
   ) +
@@ -383,10 +350,9 @@ dodge <- position_dodge(width = 0.8)
 # Create the bar plot with error bars
 ggplot(grouped_data, aes(x = robot_response_label, y = mean, fill = study_cond_label)) +
   geom_bar(stat = "identity", position = dodge) +
-  geom_errorbar(aes(ymin = mean - sem, ymax = mean + sem, group = study_cond_label), 
+  geom_errorbar(aes(ymin = mean - sem, ymax = mean + sem, group = study_cond_label),
                 width = 0.25, position = dodge) +
-  labs(title = "Average Inflates by Study Condition and Robot Response",
-       x = "Robot Response",
+  labs(x = "Robot Response",
        y = "Average Inflates After Help",
        fill = "Study Condition") +
   theme_minimal() +
