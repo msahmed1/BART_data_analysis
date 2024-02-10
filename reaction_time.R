@@ -137,7 +137,8 @@ perform_shapiro_test(
   "Shapiro-Wilk for Collect Request, Study Condition 0"
 )
 
-qqPlot(rt_cust_collect_requested_filtered$median_reaction_time)
+qqPlot(rt_cust_collect_requested_filtered$median_reaction_time, 
+       ylab = "Quantiles of Reaction Time for Collect Requests")
 
 collect_request_combined <- rbind(rt_non_cust_collect_requested_filtered, rt_cust_collect_requested_filtered)
 
@@ -183,6 +184,17 @@ res.aov <- anova_test(
   between = study_cond, # between-subjects factor
   within = robot_response # within-subjects factor
 )
+
+# Calculate Cohen's f for each effect
+res.aov$cohens_f <- sqrt(res.aov$ges / (1 - res.aov$ges))
+
+# Create messages for each effect
+for (i in 1:nrow(res.aov)) {
+  effect_name <- res.aov$term[i]
+  cohens_f <- res.aov$cohens_f[i]
+  message <- paste("Cohen's f effect size for", effect_name, ":", cohens_f)
+  print_and_save(message)
+}
 
 # Get the ANOVA table
 anova_table <- get_anova_table(res.aov)
@@ -231,7 +243,6 @@ ggplot(combined_filtered_reaction_time_data, aes(x = median_reaction_time, y = c
   geom_density_ridges(alpha = 0.4, scale = 0.6) +
   geom_boxplot(aes(y = combined_label, x = median_reaction_time), width = 0.2, alpha = 0.3) +
   labs(
-    title = "Median Reaction Time by Study Condition and Robot Response",
     x = "Median Reaction Time (seconds)",
     y = "Condition"
   ) +
