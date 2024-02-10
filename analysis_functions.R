@@ -1,7 +1,11 @@
+if (!require(car)) {
+  install.packages("car")
+}
 if (!require(rstatix)) {
   install.packages("rstatix")
 }
 library(rstatix)
+library(car)
 
 # Clear the output file initially
 cat("", file = output_file)
