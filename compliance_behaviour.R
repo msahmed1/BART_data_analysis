@@ -22,7 +22,7 @@ library(ggplot2)
 library(dplyr)
 
 # File to save output
-output_file <- "compliance_behaviour_results.txt"
+output_file <- "output_files/compliance_behaviour_results.txt"
 
 source("./analysis_functions.R")
 

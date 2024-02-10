@@ -14,7 +14,7 @@ library(RSQLite)
 library(tidyr)
 
 # File to save output
-output_file <- "reaction_time_results.txt"
+output_file <- "output_files/reaction_time_results.txt"
 
 source("./analysis_functions.R")
 

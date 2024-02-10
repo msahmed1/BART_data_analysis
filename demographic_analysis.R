@@ -14,7 +14,7 @@ library(RSQLite)
 library(car)
 
 # File to save output
-output_file <- "demographic_analysis_results.txt"
+output_file <- "output_files/demographic_analysis_results.txt"
 
 source("./analysis_functions.R")
 

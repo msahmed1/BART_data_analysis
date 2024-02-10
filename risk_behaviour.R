@@ -21,7 +21,7 @@ library(RSQLite)
 library(ggplot2)
 
 # File to save output
-output_file <- "risk_behaviour_results.txt"
+output_file <- "output_files/risk_behaviour_results.txt"
 
 source("./analysis_functions.R")
 
