@@ -1,37 +1,46 @@
-# Data analysis
+# Data Analysis Documentation
 
-This documentation provides a detailed breakdown of the various tests and analyses performed on the collected data, including Likert scale questionnaires, structured face-to-face interviews, and objective behavioural measures, ensuring a transparent and comprehensive insight into the analytical process.
+This README provides a detailed breakdown of our data analysis process, including how we have approached Likert scale questionnaires, structured interviews, and objective behavioural measures. Our primary goal is to ensure transparency and offer a clear understanding of the methodologies employed in our study.
+
+# Repository Structure
+
+Our data analysis is divided into separate R scripts for clarity and modularity:
+
+- ‘demographic_analysis.R’: Analyses participant demographics.
+- ‘compliance_behaviour.R’: Examines adherence to robot suggestions.
+- ‘risk_behaviour.R’: Assesses participant risk-taking behaviours.
+- ‘reaction_time.R’: Measures response times following robot interactions.
+- ‘survey_data_analysis.R’: Processes and analyses survey data.
+- ‘interview_data_analysis.R’: Analyses interview data quantitatively and thematically.
+
+These scripts operate independently, with database operations intentionally repeated for readability. Console outputs are saved as a .txt file in the output_files folder, and plots are generated but not automatically saved.
+
+Supporting functions are found in analysis_functions.R, which contains statistical models and calculations for effect sizes.
+
+# How to Use
+
+1. Setup: Ensure all required libraries are installed in R.
+2. Run Scripts: Execute an R script to perform the respective analysis.
+3. Review Outputs: Outputs are stored in output_files. Review these for analysis results and save plots as needed.
 
 ## Data Processing
 
-Our analysis excluded data from the first six balloons as we assumed participants were acclimating to the game and the robot during these initial balloon trials. This approach helped in mitigating potential learning effects on the data.
+We categorised our analysis into three main areas:
 
-Data processing was categorised into three main areas:
+1. **Compliance with robot suggestions**
+   - After help was requested, we monitored the participant’s actions and calculated the percentage compliance for each action. Compliance was achieved when the participant pressed the inflate button for an inflate request and the collect button for a collect request.
+   - We also recorded the number of inflates after help was requested to indicate the level of trust in the robot. The average inflates after help was requested was calculated by dividing the inflates after help requests by the number of times help was requested.
+2. **Risk-taking behaviour** during the experiment, we measured the total balloon inflation by recording the number of times a participant pressed the inflate button for each balloon. We calculated the average balloon inflation by dividing the sum of the total inflates by the number of balloons that did not burst in the given block. This metric assessed any differences in participants’ behaviour across the study conditions and both games, regardless of the study conditions.
+3. **Reaction time** to decide what to do after clicking the request help button was recorded. Initially, we normalised this data using the mean reaction time, but due to outliers skewing the data, we used the median reaction time to reduce the impact of outliers on the data analysis.
 
-- **Compliance with robot suggestions**
-  - we monitored the actions taken after help was requested. We established that compliance for an inflate request was achieved when the participant pressed inflate after requesting help, and for a collect request, compliance was achieved when the participant pressed the collect button after requesting help. Percentage compliance was calculated as the total number of times the participant complied with the robot’s suggestion divided by the total number of times they asked for help from the robot.
-  - The number of inflates after help was requested was also recorded. This was used to indicate the level of trust ascribed to the robot by how much the participant inflated the balloon after requesting help. From this, the average inflates after help was requested was calculated by dividing inflates after help requests by the number of times help was requested.
-- **Risk-taking behaviour** during the experiment, we measured the total balloon inflation, which refers to the number of times a participant pressed the inflate button for each balloon. From this, we calculated the average balloon inflation across both blocks by dividing the sum of the total inflates by the number of balloons that did not burst in the given block. This metric assessed any differences in participants’ behaviour across the study conditions and across both games regardless of the study conditions.
-- **Reaction time** to decide what to do after the request help button was clicked was recorded. Initially, we normalised this data using the mean reaction time data; however, due to outliers skewing the data, we decided to use the median reaction time to reduce the impact of outliers on the data analysis.
+We excluded data from the first six balloons as participants were assumed to be acclimating to the game and the robot during these initial balloon trials. The exclusion criteria for objective data was set to two standard deviations from the mean, which captured 95% of the dataset. Therefore, any data outside this bound was considered an outlier. Each category above was treated as an independent observation, and the absence of excluded participants in multiple datasets supports this assumption.
 
-Additionally, the exclusion criteria for objective data was set to two standard deviations from the mean. Two standard deviations capture 95% of the dataset; therefore, it was assumed that any data outside of this bound must be an outlier. Each of the above categories was treated as independent observation; the absence of excluded participants in multiple datasets supports this assumption.
-
-For the Likert-scale questionnaire, we computed the mean score for each scale to gauge the general perceptions of the robot among the participants and if this changed between the groups. The mean for each questionnaire was used since the Likert scale is analysed as interval data; therefore, the mean is used to find the central tendency for each participant.
+For the Likert-scale questionnaire, we computed the mean score for each scale to gauge the general perceptions of the robot among the participants and to determine any changes between groups. The mean for each questionnaire was used since the Likert scale is analysed as interval data, and it helps to find the central tendency for each participant.
 
 # Analytic methods
 
-Objective datasets were assessed using Shapiro-Wilk normality and Levene’s homogeneity tests post-exclusion criteria. To ensure the accuracy of the Shapiro-Wilk normality test, the Q-Q plot was examined for the impact of outliers, as the test is sensitive to small sample sizes. Non-parametric methods were used for datasets that did not meet these assumptions.
+We employed a combination of parametric and non-parametric tests, including Shapiro-Wilk normality, Levene’s homogeneity tests, Wilcoxon rank-sum, signed-rank tests and Mixed ANOVA, depending on the data distribution and sample size constraints. Post hoc analysis and effect size were calculations performed on significant results to determine the practical significance.
 
-To compare independent observations, the Wilcoxon rank-sum test, the non-parametric alternative of the independent samples t-test, was used, and the test results were based on an approximation method due to the presence of ties. We used this test to evaluate the compliance analysis for inflation behaviour after receiving help from the robot.
+Subjective questionnaire data, meeting assumptions of normality and homogeneity of variance, were analysed with independent samples t-tests alongside effect size calculations to determine practical significance.
 
-To compare related observations for non-group comparisons, the paired samples t-test was used. In cases where the data violated the assumptions of parametric tests, the Wilcoxon-signed rank test was used. We analysed compliance and risk-taking behaviours for non-group effects.
-
-The data was analysed to evaluate the percentage of compliance with the suggestions made by the robots. The dataset was split into compliance percentages for each robot response (`inflate'' and `collect'') between study conditions. The analysis of these subsets showed little variation between the participants. Due to the non-normal distribution and the prevalence of ties within the data, traditional statistical analysis was deemed inappropriate for comparisons between study conditions. Instead, a visual inspection was conducted on the generated plots
-
-The reaction time data was evaluated for parametric testing; however, one of the data subsets did not satisfy the assumptions of parametric testing; however, after reviewing the Q-Q plot of the distribution, it was observed a single outlier was significantly impacting the Shapiro-Wilks normality test. Therefore, we decided to assume the data satisfied the assumptions of parametric testing, and we used mixed ANOVA to evaluate the impact of the robot’s response on participant reaction time across both study conditions.
-
-In using non-parametric Tests, we acknowledged the potential limitation of reduced statistical power, particularly with smaller sample sizes. We supplemented significant results with post hoc analyses and effect size. This was to ensure significant findings were noticed and provide a measure of the practical significance of our results.
-
-As for the subjective questionnaires, Shapiro-Wilk and Levene’s tests confirmed the normal distribution ($p > 0.05$) and homogeneity of variances ($p > 0.05$) for likeability, intelligence, trustworthiness, and ownership metrics, leading to the use of independent samples t-tests. Effect sizes were also calculated to understand the observed differences’ practical significance.
-
-The structured interview was analysed quantitatively for closed-ended questions, while open-ended questions were analysed thematically. Themes related to the participant’s perception and reception of robot suggestions were identified to understand the subjective aspects of robot and participant interaction. Percentage analysis was carried out to represent the participant’s responses numerically. The themes identified were related to robot intelligence, helpfulness, and ownership.
+Interview data were analysed quantitatively for closed questions and thematically for open-ended responses, identifying key themes related to participants’ perceptions of the robot.
