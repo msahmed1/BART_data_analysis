@@ -2,7 +2,7 @@
 
 This README provides a detailed breakdown of our data analysis process, including how we have approached Likert scale questionnaires, structured interviews, and objective behavioural measures. Our primary goal is to ensure transparency and offer a clear understanding of the methodologies employed in our study.
 
-# Repository Structure
+## Repository Structure
 
 Our data analysis is divided into separate R scripts for clarity and modularity:
 
@@ -17,11 +17,11 @@ These scripts operate independently, with database operations intentionally repe
 
 Supporting functions are found in analysis_functions.R, which contains statistical models and calculations for effect sizes.
 
-# How to Use
+## How to Use
 
 1. Setup: Ensure all required libraries are installed in R.
 2. Run Scripts: Execute an R script to perform the respective analysis.
-3. Review Outputs: Outputs are stored in output_files. Review these for analysis results and save plots as needed.
+3. View Outputs: Outputs are stored in output_files
 
 ## Data Processing
 
@@ -37,7 +37,7 @@ We excluded data from the first six balloons as participants were assumed to be 
 
 For the Likert-scale questionnaire, we computed the mean score for each scale to gauge the general perceptions of the robot among the participants and to determine any changes between groups. The mean for each questionnaire was used since the Likert scale is analysed as interval data, and it helps to find the central tendency for each participant.
 
-# Analytic methods
+## Analytic methods
 
 We employed a combination of parametric and non-parametric tests, including Shapiro-Wilk normality, Levene’s homogeneity tests, Wilcoxon rank-sum, signed-rank tests and Mixed ANOVA, depending on the data distribution and sample size constraints. Post hoc analysis and effect size were calculations performed on significant results to determine the practical significance.
 
