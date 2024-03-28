@@ -1,4 +1,4 @@
-# Set the working directory and include required packages
+# Set the working directory and include the required packages
 
 setwd(getSrcDirectory(function() {})[1])
 
@@ -18,7 +18,7 @@ source("./analysis_functions.R")
 db_path <- "./participant.db"
 conn <- dbConnect(RSQLite::SQLite(), dbname = db_path)
 
-# Extract and analyze survey data
+# Extract and analyse survey data
 
 final_survey_query <- "
   SELECT final_survey.*, players.customise_first  AS study_cond
@@ -29,7 +29,7 @@ final_survey_query <- "
 
 final_survey_data <- dbGetQuery(conn, final_survey_query)
 
-# Subset data where study_cond is 1 (True)
+# Subt data where study_cond is 1 (True)
 final_survey_customise_cond <-
   final_survey_data[final_survey_data$study_cond == 1,]
 
@@ -62,7 +62,7 @@ likability_non_customise <-
     "awful_nice"
   )]
 
-# Calculate the average likability score and add it as column in the database for each condition
+# Calculate the average likability score and add it as a column in the database for each condition
 final_survey_customise_cond$avg_likability <-
   rowMeans(likability_customise, na.rm = TRUE)
 final_survey_non_customise_cond$avg_likability <-
@@ -113,7 +113,7 @@ intelligence_non_customise <-
     "foolish_sensible"
   )]
 
-# Calculate the average intelligence score and add it as column in the database for each condition
+# Calculate the average intelligence score and add it as a column in the database for each condition
 final_survey_customise_cond$avg_intelligence <-
   rowMeans(intelligence_customise, na.rm = TRUE)
 final_survey_non_customise_cond$avg_intelligence <-
@@ -162,7 +162,7 @@ ownership_non_customise <-
     "this_robot_incorporates_a_part_of_myself"
   )]
 
-# Calculate the average ownership score and add it as column in the database for each condition
+# Calculate the average ownership score and add it as a column in the database for each condition
 final_survey_customise_cond$avg_ownership <-
   rowMeans(ownership_customise, na.rm = TRUE)
 final_survey_non_customise_cond$avg_ownership <-
@@ -201,16 +201,16 @@ median_ownership_customise <- median(final_survey_customise_cond$avg_ownership, 
 # Calculate IQR for customise condition
 iqr_ownership_customise <- IQR(final_survey_customise_cond$avg_ownership, na.rm = TRUE)
 
-# Calculate median for non-customise condition
+# Calculate the median for non-customise condition
 median_ownership_non_customise <- median(final_survey_non_customise_cond$avg_ownership, na.rm = TRUE)
 
 # Calculate IQR for non-customise condition
 iqr_ownership_non_customise <- IQR(final_survey_non_customise_cond$avg_ownership, na.rm = TRUE)
 
-# Calculate standard deviation for customise condition
+# Calculate the standard deviation for customise condition
 std_dev_customise <- sd(final_survey_customise_cond$avg_ownership, na.rm = TRUE)
 
-# Calculate standard deviation for non-customise condition
+# Calculate the standard deviation for non-customise condition
 std_dev_non_customise <- sd(final_survey_non_customise_cond$avg_ownership, na.rm = TRUE)
 
 # Print the results
@@ -245,7 +245,7 @@ trust_non_customise <-
     "i_can_trust_the_robot"
   )]
 
-# Calculate the average trustworthiness score and add it as column in the database for each condition
+# Calculate the average trustworthiness score and add it as a column in the database for each condition
 final_survey_customise_cond$avg_trust <-
   rowMeans(trust_customise, na.rm = TRUE)
 final_survey_non_customise_cond$avg_trust <-
