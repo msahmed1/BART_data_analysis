@@ -2,7 +2,7 @@
 
 This README provides a detailed breakdown of our data analysis process, including how we have approached Likert scale questionnaires, structured interviews, and objective behavioural measures. Our primary goal is to ensure transparency and offer a clear understanding of the methodologies employed in our study.
 
-## Repository Structure
+# Repository Structure
 
 Our data analysis is divided into separate R scripts for clarity and modularity:
 
@@ -17,11 +17,56 @@ These scripts operate independently, with database operations intentionally repe
 
 Supporting functions are found in analysis_functions.R, which contains statistical models and calculations for effect sizes.
 
-## How to Use
+# How to Use
 
 1. Setup: Ensure all required libraries are installed in R.
-2. Run Scripts: Execute an R script to perform the respective analysis.
-3. View Outputs: Outputs are stored in output_files
+2. Run Scripts: Execute an entier file by pressing cmd + shift + enter
+3. Review Outputs: Outputs are stored in output_files. Review these for analysis results and save plots as needed.
+
+## Database structure
+The participant.db is a SQL databe that contains three tables which are:
+1. balloon_inflate,
+  - player_id
+  - balloon_id
+  - balloon_limit
+  - total_inflates
+  - game_round
+  - help_requested
+  - robot_response
+  - inflate_after_help_request
+  - total_inflates_before_help_request
+  - time_to_decide
+2. final_survey,
+  - player_id
+  - dislike_like
+  - unfridently_friendly
+  - unkind_kind
+  - unpleasant_pleasant
+  - auful_nice
+  - incompetent_competent
+  - ignorant_knowledgeable
+  - Irresponsible_responsible
+  - unintelligent_intelligent
+  - foolish_sensible
+  - this_is_my_robot
+  - I_sense_that_i_own_this_robot
+  - this_robot_incorporates_a_part_of_myself
+  - i_am_confident_in_the_robot
+  - the_robot_has_integrity
+  - the_robot_gave_good_advice
+  - the_robot_is_reliable
+  - i_can_trust_the_robot
+  - i_am_familiar_with_the_robot
+  - free_text
+3. players,
+  - player_id
+  - date_created
+  - Customise_first
+  - testing
+  - consent
+  - game_completed
+  - age
+  - gender
 
 ## Data Processing
 
@@ -37,7 +82,7 @@ We excluded data from the first six balloons as participants were assumed to be 
 
 For the Likert-scale questionnaire, we computed the mean score for each scale to gauge the general perceptions of the robot among the participants and to determine any changes between groups. The mean for each questionnaire was used since the Likert scale is analysed as interval data, and it helps to find the central tendency for each participant.
 
-## Analytic methods
+# Analytic methods
 
 We employed a combination of parametric and non-parametric tests, including Shapiro-Wilk normality, Levene’s homogeneity tests, Wilcoxon rank-sum, signed-rank tests and Mixed ANOVA, depending on the data distribution and sample size constraints. Post hoc analysis and effect size were calculations performed on significant results to determine the practical significance.
 
